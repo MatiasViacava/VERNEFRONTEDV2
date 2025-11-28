@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Circular (Amber-500 de Tailwind) -->
+  <circle cx="256" cy="256" r="256" fill="#f59e0b"/>
+  
+  <!-- Letra V (Slate-900 de Tailwind) -->
+  <text x="50%" y="50%" 
+        dominant-baseline="central" 
+        text-anchor="middle" 
+        font-family="Arial, sans-serif" 
+        font-weight="bold" 
+        font-size="300" 
+        fill="#0f172a"
+        dy="25">
+    V
+  </text>
+</svg>
