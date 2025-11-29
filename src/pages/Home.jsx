@@ -1,7 +1,7 @@
+// src/pages/Home.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL || "https://vernebackendv1.onrender.com";
+import { api } from "../lib/api"; // ⬅️ usamos tu helper centralizado
 
 function Home() {
   const navigate = useNavigate();
@@ -16,36 +16,23 @@ function Home() {
     e.preventDefault();
     setMsg("");
     setLoading(true);
+
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, contrasenia }),
-      });
+      // usamos api.post que ya maneja JSON y errores
+      const data = await api.post("/api/auth/login", { usuario, contrasenia });
 
-      if (!res.ok) {
-        let errorMsg = "Usuario o contraseña inválidos";
-        const ct = res.headers.get("content-type") || "";
-        if (ct.includes("application/json")) {
-          try {
-            const data = await res.json();
-            if (data?.detail) errorMsg = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
-            if (data?.message) errorMsg = data.message;
-          } catch {
-            // ignorar
-          }
-        }
-        throw new Error(errorMsg);
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
       }
-
-      const data = await res.json().catch(() => ({}));
-      if (data?.token) localStorage.setItem("token", data.token);
-      if (data?.user) localStorage.setItem("user", JSON.stringify(data.user));
+      if (data?.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
 
       setMsg("Inicio de sesión correcto ✅");
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
+      // api.post ya construye un mensaje con detail/message si viene del backend
       setMsg(err.message || "No se pudo iniciar sesión");
     } finally {
       setLoading(false);
@@ -145,7 +132,7 @@ function Home() {
               {/* Mensaje */}
               {msg && <p className="text-center text-sm mt-1">{msg}</p>}
 
-              {/* Enlace registro alineado y con respiro */}
+              {/* Enlace registro */}
               <div className="mt-4 flex items-center justify-center gap-2 text-sm text-neutral-600">
                 <span className="inline-flex items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" className="size-4 opacity-70" viewBox="0 0 24 24" fill="currentColor">
